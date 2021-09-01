@@ -12,19 +12,23 @@ const useImportModel = () => {
 	// three.js 载入模型
 
 	const loader = new THREE.GLTFLoader();
+
+	// Optional: Provide a DRACOLoader instance to decode compressed mesh data
+	THREE.DRACOLoader.setDecoderPath( 'libs/draco' );
+	loader.setDRACOLoader( new THREE.DRACOLoader() );
+
+	// Optional: Pre-fetch Draco WASM/JS module, to save time while parsing.
+	THREE.DRACOLoader.getDecoderModule();
+
 	loader.load( 'obj/scene.gltf', function( gltf ) {
-	  window.scene.add(gltf.scene)
-		// materials.preload();
-		// var objLoader = new THREE.OBJLoader();
-		// objLoader.setMaterials( materials );
-		// objLoader.setPath( 'obj/' );
-		// objLoader.load( 'jj.obj', function ( object ) {
-		//     scene.add( object );
-		//     object.position.set(0,0,0);
-		//     object.scale.set(0.0001,0.0001,0.0001);
-		//     // var axes = new THREE.AxisHelper(10); // 坐标轴不需要
-		//     // scene.add(axes);
-		// }
+	  	window.scene.add(gltf.scene)
+
+		// gltf.animations; // Array<THREE.AnimationClip>
+		// gltf.scene; // THREE.Scene
+		// gltf.scenes; // Array<THREE.Scene>
+		// gltf.cameras; // Array<THREE.Camera>
+		// gltf.asset; // Object
+
 	}, onProgress, onError);
 }
 

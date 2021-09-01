@@ -40,14 +40,14 @@ export default defineComponent({
     // 追踪控制器
     useArMakerControls()
 
+    // 载入模型
+    useImportModel()
+
     // 循环渲染数组
     state.onRenderFcts = useRenderFcts(state.onRenderFcts, renderer)
 
     // 帧率监测
     useAnimationFrame(state.onRenderFcts, stats)
-
-    // 载入模型
-    useImportModel()
 
     return { 
       ...toRefs(state)
