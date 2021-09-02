@@ -5,6 +5,7 @@
     <br/>
     Contact me any time at <a href='https://twitter.com/jerome_etienne' target='_blank'>@jerome_etienne</a>
   </div>
+  <div class="button" id="walk">走路</div>
 </template>
 
 <script>
@@ -49,6 +50,14 @@ export default defineComponent({
     // 帧率监测
     useAnimationFrame(state.onRenderFcts, stats)
 
+    onMounted(()=>{
+      const btn = document.querySelector('#walk')
+      // 红线z 蓝线y 绿线x
+      btn.addEventListener('click',()=>{
+        window.dog.position.set(0, 0, window.dog.position.z + 0.2)
+      })
+    })
+
     return { 
       ...toRefs(state)
     }
@@ -57,5 +66,12 @@ export default defineComponent({
 </script>
 
 <style lang='less' scoped>
-
+  .button {
+    width: 100px;
+    height: 40px;
+    right: 10px;
+    position: absolute;
+    z-index: 9999;
+    background-color: skyblue;
+  }
 </style>

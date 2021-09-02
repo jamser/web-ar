@@ -21,8 +21,19 @@ const useImportModel = () => {
 	THREE.DRACOLoader.getDecoderModule();
 
 	loader.load( 'obj/scene.gltf', function( gltf ) {
-	  	window.scene.add(gltf.scene)
 
+		window.dog = gltf.scene
+
+		// 调用动画
+		window.mixer = new THREE.AnimationMixer( gltf.scene ); 
+		mixer.clipAction( gltf.animations[0] ).setDuration(5).play();
+
+		const axes = new THREE.AxisHelper(10); // 坐标轴不需要
+
+		window.scene.add(axes)
+		window.scene.add(gltf.scene)
+
+		// console.log(dog)
 		// gltf.animations; // Array<THREE.AnimationClip>
 		// gltf.scene; // THREE.Scene
 		// gltf.scenes; // Array<THREE.Scene>

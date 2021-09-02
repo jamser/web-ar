@@ -10,9 +10,10 @@ const useRenderFcts = (onRenderFcts, renderer) => {
     })
 
 	newonRenderFcts.push(function(delta){
-	// if(obj){
-		//     obj.rotation.y+=1;
-	// }
+		if(window.mixer){
+            // mixer.update(delta)//刷新动画渲染
+			window.mixer.update(delta);
+        }
 	});
 
 	//render the whole thing on the page
