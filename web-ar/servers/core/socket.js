@@ -13,6 +13,9 @@ class Socket{
 
     // 加入游戏
     socket.on(Constants.MSG_TYPES.JOIN_GAME, this.game.joinGame.bind(this.game, socket))
+
+    // 控制
+    socket.on(Constants.MSG_TYPES.INPUT, this.game.handleInput.bind(this.game, socket))
     
     // 断开游戏
     socket.on('disconnect', this.game.disconnect.bind(this.game, socket))

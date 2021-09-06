@@ -18,6 +18,7 @@ const useInit = () => {
 
     // 初始化摄像机位置(0，0，0)
     window.camera = new THREE.Camera();
+    window.camera.up = new THREE.Vector3(0, 0, 1)
     scene.add(camera);
 }
 

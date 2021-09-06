@@ -1,5 +1,6 @@
 import nipplejs from 'nipplejs'  // 摇杆
 import { changeAction } from '../utils/util'
+import { emitControl } from './networking'
 
 export default function Joystick(opt) {
 	if (!opt.zone) return;
@@ -30,25 +31,29 @@ export default function Joystick(opt) {
   }
   
   Joystick.prototype._on = function() {
-	var me = this;
+	var m = this;
 	this.manager
 	  .on('start', function (evt, data) {
-		changeAction('Walk')
-		me.time = setInterval(() => {
-		  me.onStart && me.onStart(me.distance,me.angle,me.vector);
+		window.mylastAnimation = window.me.animation
+		emitControl({animation: 'Walk'})
+		changeAction(window.mylastAnimation, 'Walk') //from to
+		m.time = setInterval(() => {
+		  m.onStart && m.onStart(m.distance,m.angle,m.vector);
 		}, 100);
 	  })
 	  .on('move', function (evt, data) {
 		// direction有不存在的情况 
 		if (data.direction) {
-		  me.angle = data.direction.angle;
-		  me.distance = data.distance;
-		  me.vector = data.vector;
+		  m.angle = data.direction.angle;
+		  m.distance = data.distance;
+		  m.vector = data.vector;
 		}
 	  })
 	  .on('end', function (evt, data) {
-		changeAction('Idle')
-		clearInterval(me.time);
-		me.onEnd && me.onEnd();
+		window.mylastAnimation = window.me.animation
+		emitControl({animation: 'Idle'})
+		changeAction(window.mylastAnimation, 'Idle') //from to
+		clearInterval(m.time);
+		m.onEnd && m.onEnd();
 	  });
   }

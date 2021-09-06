@@ -1,4 +1,13 @@
 import io from 'socket.io-client'
+import { processGameUpdate } from './state';
+
+const Constants = {
+  MSG_TYPES: {
+	  JOIN_GAME: 1,
+	  UPDATE: 2,
+	  INPUT: 3
+	}
+}
 
 // 这里判断是否是https，如果是https就需要使用wss协议
 const socketProtocal = (window.location.protocol.includes('https') ? 'wss' : 'ws');
@@ -19,8 +28,15 @@ export const emitControl = data => {
 
 export const connect = onGameOver => {
   connectPromise.then(()=> {
+
+    socket.on(Constants.MSG_TYPES.UPDATE, processGameUpdate)
+    
     socket.on('disconnect', () => {
       console.log('Disconnected from server.');
     })
   })
+}
+
+export const play = (username, modelName) => {
+  socket.emit(Constants.MSG_TYPES.JOIN_GAME, username, modelName)
 }

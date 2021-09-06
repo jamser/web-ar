@@ -6,6 +6,26 @@
   <div v-if="visible" :style="allHover">
     <span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">载入中{{percent}}</span>
   </div>
+  <div v-if="show" :style="allHover">
+    <div id="playerInfo" class="playerInfo" @click.stop>
+      <van-form @submit="onSubmit">
+        <van-cell-group inset>
+          <van-field
+            v-model="userName"
+            name="userName"
+            label="昵称:"
+            placeholder="请输入昵称"
+            :rules="[{ required: true, message: '请输入昵称' }]"
+          />
+        </van-cell-group>
+        <div style="margin: 16px;">
+          <van-button round block type="primary" native-type="submit">
+            提交
+          </van-button>
+        </div>
+      </van-form>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -16,16 +36,19 @@ import useRenderer from './js/useRenderer.js'
 import useInit from './js/useInit.js'
 import useArToolkit from './js/useArToolkit.js'
 import useArMakerControls from './js/useArMakerControls.js'
-import useImportModel from './js/useImportModel.js'
+// import useImportModel from './js/useImportModel.js'
 import useRenderFcts from './js/useRenderFcts.js'
 import useAnimationFrame from './js/useAnimationFrame.js'
 
+import { play, emitControl } from './js/networking.js'
 import Bus from './js/bus.js'
-import { defineComponent, onMounted, toRefs, reactive } from 'vue'
+import { defineComponent, onMounted, toRefs, reactive, ref } from 'vue'
 
 export default defineComponent({
   name: '',
   setup: () => {
+    const userName = ref('')
+    const show = ref(true)
     
     const state = reactive({
        // array of functions for the rendering loop 呈现循环的函数数组
@@ -48,10 +71,24 @@ export default defineComponent({
        percent: '0%'
     })
 
-    Bus.$on('hide', (pert)=>{
-      state.visible = false
+    const objsHub = ['knight.glb', 'Soldier.glb']
+
+    const onSubmit = (values) => {
+      console.log(values.userName)
+      let rnumber = parseInt(Math.random() * objsHub.length)
+      console.log(rnumber)
+      play(values.userName, objsHub[rnumber])
+      show.value = false
+    }
+
+    Bus.$on('number', (pert)=>{
       state.percent = pert
     })
+
+    Bus.$on('hide', ()=>{
+      state.visible = false
+    })
+    
 
     const { stats } = useStats() // 监控
     const { renderer } = useRenderer()  // 渲染器
@@ -66,7 +103,7 @@ export default defineComponent({
     useArMakerControls()
 
     // 载入模型
-    useImportModel()
+    // useImportModel()
 
     // 循环渲染数组
     state.onRenderFcts = useRenderFcts(state.onRenderFcts, renderer)
@@ -75,34 +112,77 @@ export default defineComponent({
     useAnimationFrame(state.onRenderFcts, stats)
 
     onMounted(()=>{
-      const speed = 3
       const J = new Joystick({
         zone: $('#joy-con')
       }).init()
 
-    
-
       J.onStart = function(distance, angle, vector){
-        const speed = 0.05
-        const vx = window.aim.position.x - vector.x * speed
-        const vy = window.aim.position.y
-        const vz = window.aim.position.z + vector.y * speed
-        window.aim.lookAt(new THREE.Vector3(vx, vy, vz))
-        window.aim.rotateX(Math.PI / 2)
-        window.aim.position.set(vx, vy ,vz)
+        // 红绿蓝 xyz
+        const vx = window.me.x + vector.y * me.speed 
+        const vy = window.me.y 
+        const vz = window.me.z + vector.x * me.speed
+
+        // console.log(vx, vy, vz)
+
+        emitControl({
+          vx,
+          vy,
+          vz,
+          lookAt: {vx, vy, vz},
+          rotateX: 2   // Math.PI / 2
+        })
+
+
+        // 旋转角度赋值   
+        if(window.myself){
+          // 操控方式1
+          if(['Soldier.glb'].includes(me.modelName)){
+            if(vector.x > 0 && vector.y > 0){
+              window.myself.rotation.z = (3 * Math.PI / 2 - Math.atan(vector.x / vector.y))
+            }else if(vector.x < 0 && vector.y > 0){
+              window.myself.rotation.z = (3 * Math.PI / 2 - Math.atan(vector.x / vector.y))
+            }else if(vector.x < 0 && vector.y < 0){
+              window.myself.rotation.z =  (Math.PI / 2 - Math.atan(vector.x / vector.y))
+            }else if(vector.x > 0 && vector.y < 0){
+              window.myself.rotation.z =  (Math.PI / 2 - Math.atan(vector.x / vector.y))
+            }
+            // 操控方式2
+          }else if(['knight.glb'].includes(me.modelName)){
+            if(vector.x > 0 && vector.y > 0){
+              window.myself.rotation.z = (Math.atan(vector.x / vector.y) - Math.PI / 2)
+            }else if(vector.x < 0 && vector.y > 0){
+              window.myself.rotation.z = (Math.atan(vector.x / vector.y) - Math.PI / 2)
+            }else if(vector.x < 0 && vector.y < 0){
+              window.myself.rotation.z =  (Math.atan(vector.x / vector.y) + Math.PI / 2)
+            }else if(vector.x > 0 && vector.y < 0){
+              window.myself.rotation.z =  (Math.atan(vector.x / vector.y) + Math.PI / 2)
+            }
+          }
+        }
       }
-
-
     })
 
     return { 
-      ...toRefs(state)
+      ...toRefs(state),
+      show,
+      userName,
+      onSubmit
     }
   }
 })
 </script>
 
 <style lang='less' scoped>
+  .playerInfo{
+    position: absolute;
+    top: 300px;
+    left: 25%;
+    width: 50%;
+    z-index: 9999
+  }
+  .hidden{
+    display: none !important;
+  }
   .joy-con {
     .front {
       background-color: #fff;
@@ -113,5 +193,8 @@ export default defineComponent({
       // background-size: cover;
       user-select: none;
     }
+  }
+  ::v-deep .van-cell__title.van-field__label{
+    width: 40px;
   }
 </style>
