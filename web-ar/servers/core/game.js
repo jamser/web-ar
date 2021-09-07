@@ -12,6 +12,8 @@ class Game{
 	  this.lastUpdateTime = Date.now();
 	  // 是否发送给前端数据，这里将每两帧发送一次数据
 	  this.shouldSendUpdate = false;
+	  //
+	  this.leavePlayers = []
 	  // 游戏更新
 	  setInterval(this.update.bind(this), 1000 / 60);
 	}
@@ -41,6 +43,10 @@ class Game{
 				  Constants.MSG_TYPES.UPDATE,
 				  // 处理游戏中的对象数据发送给前端
 				  this.createUpdate(player)
+			  )
+			  socket.emit(
+				  Constants.MSG_TYPES.DELETE,
+				  this.leavePlayers.length > 0 ? this.leavePlayers.shift() : null 
 			  )
 			})
 	  
@@ -108,6 +114,7 @@ class Game{
 					this.players[socket.id].lookAt = data.lookAt
 				}
 			}
+			data.rotationZ && (this.players[socket.id].rotationZ = data.rotationZ)
 			data.rotateX && (this.players[socket.id].rotateX = data.rotateX)
 			data.animation && (this.players[socket.id].animation = data.animation)
 		}
@@ -116,12 +123,17 @@ class Game{
   
 	// 玩家断开游戏
 	disconnect(socket){
+		console.log('有玩家断开连接')
 		delete this.sockets[socket.id];
 		delete this.players[socket.id];
+
+		this.leavePlayers.push(socket.id)
+		console.log(this.leavePlayers)
 
 		console.log(this.players)
 		console.log('当前人数'+ Object.keys(this.players).length)
 	}
+
   }
   
 module.exports = Game;

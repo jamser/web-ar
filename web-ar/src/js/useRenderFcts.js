@@ -1,7 +1,9 @@
 import { getCurrentState } from './state'
-import { getAsset, getMixer, getAnimations } from './assets'
+import { getAsset, getMixer } from './assets'
+
 
 let meHasRendered = false
+let othersHasRendered = {}
 
 const useRenderFcts = (onRenderFcts, renderer) => {
 	let newonRenderFcts = onRenderFcts
@@ -21,21 +23,32 @@ const useRenderFcts = (onRenderFcts, renderer) => {
 		}
 
 		renderPlayer(me, me);
-  		// others.forEach(renderPlayer.bind(null, me));
+  		others.forEach(renderPlayer.bind(null, me));
 
 		function renderPlayer(me, player){
-			const { username, id, vx = 0, vy = 0, vz = 0 } = player;
-			me && (window.me = me)  // 数据相关
-			if(!meHasRendered){
-				window.myself = getAsset(me.modelName)  // 自身模型
-				window.scene.add(myself)
-				meHasRendered = true
-			}
-			// console.log(me)
+			const { username, id, vx = 0, vy = 0, vz = 0, rotationZ } = player;
 			
-			window.myself && window.myself.position.set(vx, vy ,vz)
+			if(me === player){
+				me && (window.me = me)  // 数据相关
+				if(!meHasRendered){
+					window.myself = getAsset(me.id, me.modelName)  // 自身模型
+					window.scene.add(myself)
+					meHasRendered = true
+				}
+				window.myself.position.set(vx, vy ,vz)
+			}else{
+				id && (window[`_${id}`] = player)
+				if(!othersHasRendered[`${id}`]){
+					window[`other_${id}`] = getAsset(player.id, player.modelName)
+					window.scene.add(window[`other_${id}`])
+					othersHasRendered[`${id}`] = true
+					window.ids.push(id)
+				}
+				window[`other_${id}`].position.set(vx, vy, vz)
+				window[`other_${id}`].rotation.z = rotationZ
+			}
 
-			!window[`mixer_${id}`] && (window[`mixer_${id}`] = getMixer(me.modelName))
+			!window[`mixer_${id}`] && (window[`mixer_${id}`] = getMixer(player.id))
 			
 			if(window[`mixer_${id}`]){
 				window[`mixer_${id}`].update(delta);

@@ -4,7 +4,7 @@
   </div>
   <div class="joy-con" id="joy-con" :style="joyStyle"></div>
   <div v-if="visible" :style="allHover">
-    <span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">载入中{{percent}}</span>
+    <span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:white;">{{percent}}</span>
   </div>
   <div v-if="show" :style="allHover">
     <div id="playerInfo" class="playerInfo" @click.stop>
@@ -36,7 +36,7 @@ import useRenderer from './js/useRenderer.js'
 import useInit from './js/useInit.js'
 import useArToolkit from './js/useArToolkit.js'
 import useArMakerControls from './js/useArMakerControls.js'
-// import useImportModel from './js/useImportModel.js'
+import useOthersAnimationControl from './js/useOthersAnimationControl.js'
 import useRenderFcts from './js/useRenderFcts.js'
 import useAnimationFrame from './js/useAnimationFrame.js'
 
@@ -47,6 +47,8 @@ import { defineComponent, onMounted, toRefs, reactive, ref } from 'vue'
 export default defineComponent({
   name: '',
   setup: () => {
+    window.ids = [] // 其他玩家id集合
+
     const userName = ref('')
     const show = ref(true)
     
@@ -72,24 +74,16 @@ export default defineComponent({
     })
 
     const objsHub = ['knight.glb', 'Soldier.glb']
-
-    const onSubmit = (values) => {
-      console.log(values.userName)
-      let rnumber = parseInt(Math.random() * objsHub.length)
-      console.log(rnumber)
-      play(values.userName, objsHub[rnumber])
-      show.value = false
-    }
+    
 
     Bus.$on('number', (pert)=>{
-      state.percent = pert
+      state.percent = `载入中：${pert}` 
     })
 
     Bus.$on('hide', ()=>{
       state.visible = false
     })
     
-
     const { stats } = useStats() // 监控
     const { renderer } = useRenderer()  // 渲染器
     
@@ -104,14 +98,23 @@ export default defineComponent({
 
     // 载入模型
     // useImportModel()
-
-    // 循环渲染数组
-    state.onRenderFcts = useRenderFcts(state.onRenderFcts, renderer)
-
-    // 帧率监测
-    useAnimationFrame(state.onRenderFcts, stats)
+    const onSubmit = (values) => {
+      console.log(values.userName)
+      let rnumber = parseInt(Math.random() * objsHub.length)
+      console.log(rnumber)
+      play(values.userName, objsHub[rnumber])
+      show.value = false
+      setTimeout(()=>{
+        // 循环渲染数组
+        state.onRenderFcts = useRenderFcts(state.onRenderFcts, renderer)
+        // 帧率监测
+        useAnimationFrame(state.onRenderFcts, stats)
+      }, 500)
+    }
 
     onMounted(()=>{
+      useOthersAnimationControl()  // 动画变化监听
+
       const J = new Joystick({
         zone: $('#joy-con')
       }).init()
@@ -123,15 +126,6 @@ export default defineComponent({
         const vz = window.me.z + vector.x * me.speed
 
         // console.log(vx, vy, vz)
-
-        emitControl({
-          vx,
-          vy,
-          vz,
-          lookAt: {vx, vy, vz},
-          rotateX: 2   // Math.PI / 2
-        })
-
 
         // 旋转角度赋值   
         if(window.myself){
@@ -159,6 +153,16 @@ export default defineComponent({
             }
           }
         }
+
+        emitControl({
+          vx,
+          vy,
+          vz,
+          lookAt: {vx, vy, vz},
+          rotateX: 2,   // Math.PI / 2,
+          rotationZ: window.myself.rotation.z
+        })
+
       }
     })
 

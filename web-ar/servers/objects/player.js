@@ -15,7 +15,8 @@ class Player extends Item {
     this.lookAt = data.lookAt || {vx: 0, vy: 0, vz: 0};
     this.vx = data.vx || 0;
     this.vy = data.vy || 0;
-    this.vz = data.vz || 0;
+    this.vz = data.vz || 0; 
+    this.rotationZ = data.rotationZ || 0;
     this.animation = data.animation || 'Idle';
     this.speed = Constants.PLAYER.SPEED;
   }
@@ -37,7 +38,8 @@ class Player extends Item {
       lookAt: this.lookAt,
       rotateX: this.rotateX,
       rotateY: this.rotateY,
-      rotateZ: this.rotateZ
+      rotateZ: this.rotateZ,
+      rotationZ: this.rotationZ
     }
   }
 }

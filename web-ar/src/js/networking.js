@@ -5,7 +5,8 @@ const Constants = {
   MSG_TYPES: {
 	  JOIN_GAME: 1,
 	  UPDATE: 2,
-	  INPUT: 3
+	  INPUT: 3,
+    DELETE: 4
 	}
 }
 
@@ -33,6 +34,18 @@ export const connect = onGameOver => {
     
     socket.on('disconnect', () => {
       console.log('Disconnected from server.');
+      alert('与服务器断开连接...')
+    })
+
+    // 删除下线的小朋友
+    socket.on(Constants.MSG_TYPES.DELETE, (id) => {
+      if(id){
+        console.log('玩家：'+ id +'已经下线')
+        scene.remove(window[`other_${id}`])
+        window.ids.splice(window.ids.findIndex(x => x == id), 1)
+        window[`_${id}`] && (delete window[`_${id}`])
+        window[`other_${id}`] && (delete window[`other_${id}`])
+      }
     })
   })
 }

@@ -4,19 +4,19 @@ export function $(elem){
 	return document.querySelector(elem)
 }
 
-export function changeAction(mylastAnimation, name){
+export function changeAction(info, mylastAnimation = null, name){
 	if(mylastAnimation === name) return
 	
-	
-	const clip = getAnimations(window.me.modelName)[name]
+	const id = info.id
+	const clip = getAnimations(info.modelName)[name]
 
-	if(clip !== undefined && window[`mixer_${window.me.id}`]){
-		const action = window[`mixer_${window.me.id}`].clipAction( clip )
-		if (window[`curAction_${window.me.id}`]) window[`curAction_${window.me.id}`].crossFadeTo(action, 0.5);
+	if(clip !== undefined && window[`mixer_${id}`]){
+		const action = window[`mixer_${id}`].clipAction( clip )
+		if (window[`curAction_${id}`]) window[`curAction_${id}`].crossFadeTo(action, 0.5);
 	
 		action.enabled = true;
 		action.play();
 
-		window[`curAction_${window.me.id}`] = action
+		window[`curAction_${id}`] = action
 	}
 }

@@ -36,7 +36,7 @@ export default function Joystick(opt) {
 	  .on('start', function (evt, data) {
 		window.mylastAnimation = window.me.animation
 		emitControl({animation: 'Walk'})
-		changeAction(window.mylastAnimation, 'Walk') //from to
+		changeAction(window.me, window.mylastAnimation, 'Walk') //from to
 		m.time = setInterval(() => {
 		  m.onStart && m.onStart(m.distance,m.angle,m.vector);
 		}, 100);
@@ -52,7 +52,7 @@ export default function Joystick(opt) {
 	  .on('end', function (evt, data) {
 		window.mylastAnimation = window.me.animation
 		emitControl({animation: 'Idle'})
-		changeAction(window.mylastAnimation, 'Idle') //from to
+		changeAction(window.me, window.mylastAnimation, 'Idle') //from to
 		clearInterval(m.time);
 		m.onEnd && m.onEnd();
 	  });

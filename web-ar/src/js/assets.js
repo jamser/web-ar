@@ -18,7 +18,6 @@ const downloadPromise = Promise.all(ASSET_NAMES.map(downloadAsset))
 function downloadAsset(assetName){
 return new Promise(resolve => {
 	useImportModel(`obj/${assetName}`).then((gltf)=>{
-			console.log(gltf.scene)
 
 			console.log(`Downloaded ${assetName}`)
 			assets[assetName] = gltf.scene.children[0];
@@ -43,12 +42,12 @@ return new Promise(resolve => {
 			actionHub[assetName] = assetName === "Soldier.glb" ? ["Walk", "Run", "Idle", "TPose"] : null
 
 			// 调用动画
-			mixerHub[assetName] = new THREE.AnimationMixer( assets[assetName] ); 
+			// mixerHub[assetName] = new THREE.AnimationMixer( assets[assetName] ); 
 			// window.curAction = mixer.clipAction( window.animations[window.actionName] ).setDuration(1).play();
 			
-			const axes = new THREE.AxisHelper(10); // 坐标轴不需要
+			// const axes = new THREE.AxisHelper(10); // 坐标轴不需要
 	
-			window.scene.add(axes)
+			// window.scene.add(axes)
 			// window.scene.add(assets[assetName])
 	
 			// console.log(aim)
@@ -64,7 +63,16 @@ return new Promise(resolve => {
 }
 
 export const downloadAssets = () => downloadPromise
-export const getAsset = assetName => assets[assetName]
-export const getMixer = assetName => mixerHub[assetName]
+export const getAsset = (id, assetName) => {
+	if(!window[`assets_${id}`]){
+		window[`assets_${id}`] = THREE.SkeletonUtils.clone(assets[assetName]) // 由基础物体克隆出来
+		window[`assets_${id}`].up = new THREE.Vector3(0, 1, 0)
+		window[`assets_${id}`].position.set(0,0,0)
+		mixerHub[`${id}`] = new THREE.AnimationMixer(window[`assets_${id}`])
+	}
+	return window[`assets_${id}`]
+} 
+
+export const getMixer = id => mixerHub[id]
 export const getAnimations = assetName => animationsHub[assetName]
 export const getAction = assetName => actionHub[assetName]
