@@ -89,6 +89,9 @@ export const getAsset = (id, assetName, username) => {
 			// const meshMaterial = new THREE.MeshLambertMaterial({color: 0x808080});
 			const fontModel = new THREE.Mesh(geometry, meshMaterial);
 			fontModel.position.set(0, 30, 0);
+			if(assetName === 'knight.glb'){
+				fontModel.rotation.y = Math.PI;
+			}
 			console.log(fontModel.rotation.x,fontModel.rotation.y,fontModel.rotation.z)
 			// scene.add(fontModel);
 			// const fontModel = new THREE.Mesh(geometry,fontMaterial)
