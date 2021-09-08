@@ -3,7 +3,7 @@ module.exports = Object.freeze({
 	// 玩家的数据
 	PLAYER: {
 	  // 速度
-	  SPEED: 0.5,
+	  SPEED: 0.1,
 	},
 
 	// socket发送消息的函数名
