@@ -180,8 +180,8 @@ export default defineComponent({
   .playerInfo{
     position: absolute;
     top: 300px;
-    left: 25%;
-    width: 50%;
+    left: 12.5%;
+    width: 75%;
     z-index: 9999
   }
   .hidden{

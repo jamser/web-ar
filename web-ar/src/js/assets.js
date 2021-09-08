@@ -63,12 +63,38 @@ return new Promise(resolve => {
 }
 
 export const downloadAssets = () => downloadPromise
-export const getAsset = (id, assetName) => {
+export const getAsset = (id, assetName, username) => {
 	if(!window[`assets_${id}`]){
 		window[`assets_${id}`] = THREE.SkeletonUtils.clone(assets[assetName]) // 由基础物体克隆出来
 		window[`assets_${id}`].up = new THREE.Vector3(0, 1, 0)
 		window[`assets_${id}`].position.set(0,0,0)
 		mixerHub[`${id}`] = new THREE.AnimationMixer(window[`assets_${id}`])
+		const loader = new THREE.FontLoader();
+		loader.load('fonts/Microsoft_YaHei_Regular.json', function ( font ) {
+			const geometry = new THREE.TextGeometry( username , {
+				font: font,
+				size: 20,
+				height: 1,
+				// curveSegments: 12,
+				// bevelEnabled: true,
+				// bevelThickness: 10,
+				// bevelSize: 8,
+				// bevelSegments: 5
+			} );
+			const meshMaterial = new THREE.MeshNormalMaterial({
+                flatShading: THREE.FlatShading,
+                transparent: true,
+                opacity: 0.9
+   		    });
+			// const meshMaterial = new THREE.MeshLambertMaterial({color: 0x808080});
+			const fontModel = new THREE.Mesh(geometry, meshMaterial);
+			fontModel.position.set(0, 30, 0);
+			console.log(fontModel.rotation.x,fontModel.rotation.y,fontModel.rotation.z)
+			// scene.add(fontModel);
+			// const fontModel = new THREE.Mesh(geometry,fontMaterial)
+			// fontModel.position.set(10,10,10)
+			window[`assets_${id}`].add(fontModel)
+		})
 	}
 	return window[`assets_${id}`]
 } 

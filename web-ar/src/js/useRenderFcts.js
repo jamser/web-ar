@@ -31,7 +31,7 @@ const useRenderFcts = (onRenderFcts, renderer) => {
 			if(me === player){
 				me && (window.me = me)  // 数据相关
 				if(!meHasRendered){
-					window.myself = getAsset(me.id, me.modelName)  // 自身模型
+					window.myself = getAsset(me.id, me.modelName, me.username)  // 自身模型
 					window.scene.add(myself)
 					meHasRendered = true
 				}
@@ -39,7 +39,7 @@ const useRenderFcts = (onRenderFcts, renderer) => {
 			}else{
 				id && (window[`_${id}`] = player)
 				if(!othersHasRendered[`${id}`]){
-					window[`other_${id}`] = getAsset(player.id, player.modelName)
+					window[`other_${id}`] = getAsset(player.id, player.modelName, player.username)
 					window.scene.add(window[`other_${id}`])
 					othersHasRendered[`${id}`] = true
 					window.ids.push(id)
@@ -54,11 +54,6 @@ const useRenderFcts = (onRenderFcts, renderer) => {
 				window[`mixer_${id}`].update(delta);
 			}
 
-			// // 绘制玩家的名称
-			// ctx.fillStyle = 'white'
-			// ctx.textAlign = 'center';
-			// ctx.font = "20px '微软雅黑'"
-			// ctx.fillText(player.username, canvasX, canvasY - PLAYER.RADUIS - 16)
 		  }
 	})
 
