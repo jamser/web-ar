@@ -12,7 +12,7 @@ export function changeAction(info, mylastAnimation = null, name){
 
 	if(clip !== undefined && window[`mixer_${id}`]){
 		const action = window[`mixer_${id}`].clipAction( clip )
-		if (window[`curAction_${id}`]) window[`curAction_${id}`].crossFadeTo(action, 0.5);
+		if (window[`curAction_${id}`]) window[`curAction_${id}`].crossFadeTo(action, 0.1);
 	
 		action.enabled = true;
 		action.play();

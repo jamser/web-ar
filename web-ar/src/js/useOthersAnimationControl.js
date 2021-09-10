@@ -14,7 +14,7 @@ const useOthersAnimationControl = () => {
 
 				if(clip !== undefined && window[`mixer_${id}`]){
 					const action = window[`mixer_${id}`].clipAction( clip )
-					if (window[`last_anim_${id}`]) window[`last_anim_${id}`].crossFadeTo(action, 0.2);
+					if (window[`last_anim_${id}`]) window[`last_anim_${id}`].crossFadeTo(action, 0.1);
 				
 					action.enabled = true;
 					action.play();
@@ -24,7 +24,7 @@ const useOthersAnimationControl = () => {
 				}
 			})
 		}
-	}, 1000)
+	}, 30)
 }
 
 

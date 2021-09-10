@@ -18,7 +18,7 @@ class Player extends Item {
     this.vz = data.vz || 0; 
     this.rotationZ = data.rotationZ || 0;
     this.animation = data.animation || 'Idle';
-    this.speed = Constants.PLAYER.SPEED;
+    this.speed = ['ybot.fbx', 'xbot.fbx'].includes(this.modelName) ? 0.3 : Constants.PLAYER.SPEED;
   }
 
   update(dt){

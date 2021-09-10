@@ -19,8 +19,8 @@
           />
         </van-cell-group>
         <div style="margin: 16px;">
-          <van-button round block type="primary" native-type="submit">
-            提交
+          <van-button round block type="primary" native-type="submit" :disabled="disabled">
+            {{percent}}
           </van-button>
         </div>
       </van-form>
@@ -40,14 +40,17 @@ import useOthersAnimationControl from './js/useOthersAnimationControl.js'
 import useRenderFcts from './js/useRenderFcts.js'
 import useAnimationFrame from './js/useAnimationFrame.js'
 
+import { changeAction } from './utils/util.js'
 import { play, emitControl } from './js/networking.js'
 import Bus from './js/bus.js'
+import { ASSET_NAMES, ANIMATIONS } from './common/common.js'
 import { defineComponent, onMounted, toRefs, reactive, ref } from 'vue'
 
 export default defineComponent({
   name: '',
   setup: () => {
     window.ids = [] // 其他玩家id集合
+    const objsHub = ASSET_NAMES // 模型集合
 
     const userName = ref('')
     const show = ref(true)
@@ -70,17 +73,21 @@ export default defineComponent({
        },
        onRenderFcts: [],
        visible: true,
-       percent: '0%'
+       percent: '0%',
+       disabled: true
     })
 
-    const objsHub = ['knight.glb', 'Soldier.glb']
     
 
     Bus.$on('number', (pert)=>{
-      state.percent = `载入中：${pert}` 
+      state.percent = `资源载入中：${pert}` 
+      if(pert === '100%'){
+        state.percent = '提交'
+        state.disabled = false
+      }
     })
 
-    Bus.$on('hide', ()=>{
+    Bus.$on('hide', () => {
       state.visible = false
     })
     
@@ -95,6 +102,12 @@ export default defineComponent({
 
     // 追踪控制器
     useArMakerControls()
+
+    // const dance = () => {
+    //   window.mylastAnimation = window.me.animation
+    //   emitControl({animation: 'Flair'})
+    //   changeAction(window.me, window.mylastAnimation, 'Flair') //from to
+    // }
 
     // 载入模型
     // useImportModel()
@@ -121,9 +134,9 @@ export default defineComponent({
 
       J.onStart = function(distance, angle, vector){
         // 红绿蓝 xyz
-        const vx = window.me.x + vector.y * me.speed 
-        const vy = window.me.y 
-        const vz = window.me.z + vector.x * me.speed
+        let vx = window.me.x + vector.y * me.speed 
+        let vy = window.me.y 
+        let vz = window.me.z + vector.x * me.speed
 
         // console.log(vx, vy, vz)
 
@@ -151,6 +164,8 @@ export default defineComponent({
             }else if(vector.x > 0 && vector.y < 0){
               window.myself.rotation.z =  (Math.atan(vector.x / vector.y) + Math.PI / 2)
             }
+          }else{
+            window.myself.lookAt(new THREE.Vector3(vx, vy ,vz))
           }
         }
 
@@ -170,7 +185,8 @@ export default defineComponent({
       ...toRefs(state),
       show,
       userName,
-      onSubmit
+      onSubmit,
+      dance
     }
   }
 })
