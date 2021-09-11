@@ -15,7 +15,7 @@ const useImportModel = (modelName) => {
 		// three.js 载入模型
 		
 		console.log(modelName)
-		if(/\.glb$/.test(modelName)){
+		if(/\.glb|\.gltf$/.test(modelName)){
 			const loader = new THREE.GLTFLoader();
 			const dracoLoader = new THREE.DRACOLoader()
 			// Optional: Provide a DRACOLoader instance to decode compressed mesh data

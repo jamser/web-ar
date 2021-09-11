@@ -56,7 +56,11 @@ export default defineComponent({
   name: '',
   setup: () => {
     window.ids = [] // 其他玩家id集合
-    const objsHub = ASSET_NAMES // 模型集合
+    const objsHub = ASSET_NAMES.filter(item => {
+      return (item !== 'magicRing/scene.gltf') && 1
+    }) // 模型集合
+
+    console.log(objsHub)
 
     const userName = ref('')
     const show = ref(true)

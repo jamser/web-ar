@@ -11,9 +11,11 @@ const actionHub = {};
 
 const downloadAnims = Promise.all(ANIMATIONS.map(downloadAnim)).then(()=>{
 	console.log(animationsHub)
+	// // gltf注释掉下面三行
 	ASSET_NAMES.map(item => {
 		animationsClipHub[item] = animationsHub
 	})
+	console.log(animationsClipHub)
 })
 
 // 每一张图片都是通过promise进行加载的，所有图片加载成功后，Promise.all就会结束
@@ -39,7 +41,8 @@ return new Promise(resolve => {
 			console.log(model[0], model[1])
 			if(model[1] === 'gltf'){
 				const gltf = model[0]
-				assets[assetName] = gltf.scene.children[0];
+				console.log(gltf.scene)
+				assets[assetName] = gltf.scene
 
 				let animations = {};
 	
@@ -53,8 +56,7 @@ return new Promise(resolve => {
 
 				assets[assetName].up = new THREE.Vector3(0, 1, 0)
 		
-				assets[assetName].position.set(0,0,0)
-				// gltf.scene.scale.set(0.01,0.01,0.01)
+				
 				// aim.lookAt(new THREE.Vector3(0,1,0))
 		
 				actionHub[assetName] = assetName === "knight.glb" ? ["Walk", "Dance", "Idle", "Die"] : null
@@ -67,7 +69,17 @@ return new Promise(resolve => {
 				// const axes = new THREE.AxisHelper(10); // 坐标轴不需要
 		
 				// window.scene.add(axes)
-				// window.scene.add(assets[assetName])
+				if(assetName === 'magicRing/scene.gltf'){
+					// assets[assetName].position.set(0, -0.2 ,0)
+					// assets[assetName].scale.set(0.3, 0.3 ,0.3)
+					// const mixer = new THREE.AnimationMixer(assets[assetName]).clipAction(animationsClipHub['magicRing/scene.gltf']['Take 01'])
+					// mixer.enabled = true
+					// mixer.play()
+					// window.scene.add(assets[assetName])
+				}else{
+					assets[assetName].position.set(0, 0 ,0)
+					assets[assetName].scale.set(1, 1 ,1)
+				}
 		
 				// console.log(aim)
 				// gltf.animations; // Array<THREE.AnimationClip>
@@ -126,7 +138,12 @@ export const getAsset = (id, assetName, username) => {
 			// scene.add(fontModel);
 			// const fontModel = new THREE.Mesh(geometry,fontMaterial)
 			// fontModel.position.set(10,10,10)
+
+			// 加文字
 			window[`assets_${id}`].add(fontModel)
+
+			// 非gltf注释掉下面一行
+			// window[`mixer_${id}`].clipAction(getAnimations(assetName)['Scene']).setDuration(20).play()
 		})
 	}
 	return window[`assets_${id}`]

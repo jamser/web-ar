@@ -3,6 +3,9 @@ const ASSET_NAMES = [
 	'ybot.fbx',
 	// 'knight.glb',
 	// 'Soldier.glb'
+	// 'scene.gltf',
+	'magicRing/scene.gltf'
+	
 ]
 
 const ANIMATIONS = [
