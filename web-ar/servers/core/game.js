@@ -12,8 +12,10 @@ class Game{
 	  this.lastUpdateTime = Date.now();
 	  // 是否发送给前端数据，这里将每两帧发送一次数据
 	  this.shouldSendUpdate = false;
-	  //
+	  // 离开的玩家
 	  this.leavePlayers = []
+	  // 所有聊天
+	  this.allMsg = ['坐标世界导游: 欢迎来到社交元宇宙！']
 	  // 游戏更新
 	  setInterval(this.update.bind(this), 1000 / 60);
 	}
@@ -48,6 +50,7 @@ class Game{
 				  Constants.MSG_TYPES.DELETE,
 				  this.leavePlayers.length > 0 ? this.leavePlayers.shift() : null 
 			  )
+			  socket.emit(Constants.MSG_TYPES.TALK_BOARD, this.allMsg)
 			})
 	  
 			this.shouldSendUpdate = false;
@@ -114,10 +117,17 @@ class Game{
 					this.players[socket.id].lookAt = data.lookAt
 				}
 			}
+			data.rotationY && (this.players[socket.id].rotationY = data.rotationY)
 			data.rotationZ && (this.players[socket.id].rotationZ = data.rotationZ)
 			data.rotateX && (this.players[socket.id].rotateX = data.rotateX)
 			data.animation && (this.players[socket.id].animation = data.animation)
 		}
+	}
+
+	// 添加聊天
+	addMsg(socket, msg){
+		this.allMsg.push(msg)
+		// console.log(this.allMsg)
 	}
 
   

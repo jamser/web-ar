@@ -11,6 +11,8 @@ module.exports = Object.freeze({
 	  JOIN_GAME: 1,
 	  UPDATE: 2,
 	  INPUT: 3,
-	  DELETE: 4
+	  DELETE: 4,
+	  ADD_MSG: 5,
+	  TALK_BOARD: 6
 	}
   })

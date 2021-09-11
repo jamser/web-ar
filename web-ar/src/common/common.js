@@ -9,7 +9,9 @@ const ANIMATIONS = [
 	'Walk.fbx',
 	'Idle.fbx',
 	'Piano Playing.fbx',
-	'Flair.fbx'
+	'Flair.fbx',
+	'Uprock.fbx',
+	'HitPop.fbx'
 ]
 
 

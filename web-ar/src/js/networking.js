@@ -1,12 +1,15 @@
 import io from 'socket.io-client'
 import { processGameUpdate } from './state';
+import { $ } from '../utils/util'
 
 const Constants = {
   MSG_TYPES: {
 	  JOIN_GAME: 1,
 	  UPDATE: 2,
 	  INPUT: 3,
-    DELETE: 4
+    DELETE: 4,
+    ADD_MSG: 5,
+    TALK_BOARD: 6
 	}
 }
 
@@ -47,9 +50,26 @@ export const connect = onGameOver => {
         window[`other_${id}`] && (delete window[`other_${id}`])
       }
     })
+
+    socket.on(Constants.MSG_TYPES.TALK_BOARD, (allMsgs) => {
+      // console.log('hello')
+      // console.log(allMsgs)
+      let ms = allMsgs
+      if(allMsgs.length > 20){
+        ms = ms.slice(-20)
+      }
+      ms = ms.map(item => `<p style="color: white;">${item}</p>`)
+      // console.log('ms' + ms)
+      $('#talkDialog').innerHTML = ms.join('')
+      $('#talkDialog').scrollTop = $('#talkDialog').scrollHeight
+    })
   })
 }
 
 export const play = (username, modelName) => {
   socket.emit(Constants.MSG_TYPES.JOIN_GAME, username, modelName)
+}
+
+export const sendMsg = (username, msg) => {
+  socket.emit(Constants.MSG_TYPES.ADD_MSG, `${username}: ${msg}`)
 }

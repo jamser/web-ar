@@ -26,7 +26,7 @@ const useRenderFcts = (onRenderFcts, renderer) => {
   		others.forEach(renderPlayer.bind(null, me));
 
 		function renderPlayer(me, player){
-			const { lookAt, id, vx = 0, vy = 0, vz = 0, rotationZ } = player;
+			const { lookAt, id, vx = 0, vy = 0, vz = 0, rotationZ, rotationY } = player;
 			
 			if(me === player){
 				me && (window.me = me)  // 数据相关
@@ -45,9 +45,9 @@ const useRenderFcts = (onRenderFcts, renderer) => {
 					window.ids.push(id)
 				}
 				window[`other_${id}`].position.set(vx, vy, vz)
-				if(!(lookAt.x === 0 || lookAt.y === 0 || lookAt.z === 0)){
+				if(rotationY){
 					// console.log(lookAt)
-					window[`other_${id}`].lookAt(new THREE.Vector3(lookAt.vx * 50, lookAt.vy * 50, lookAt.vz * 50))
+					window[`other_${id}`].rotation.y = rotationY
 				}else{
 					window[`other_${id}`].rotation.z = rotationZ
 				}

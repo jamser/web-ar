@@ -16,6 +16,7 @@ class Player extends Item {
     this.vx = data.vx || 0;
     this.vy = data.vy || 0;
     this.vz = data.vz || 0; 
+    this.rotationY = data.rotationY || 0;
     this.rotationZ = data.rotationZ || 0;
     this.animation = data.animation || 'Idle';
     this.speed = ['ybot.fbx', 'xbot.fbx'].includes(this.modelName) ? 0.3 : Constants.PLAYER.SPEED;
@@ -39,6 +40,7 @@ class Player extends Item {
       rotateX: this.rotateX,
       rotateY: this.rotateY,
       rotateZ: this.rotateZ,
+      rotationY: this.rotationY,
       rotationZ: this.rotationZ
     }
   }

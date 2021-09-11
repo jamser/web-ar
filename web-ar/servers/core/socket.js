@@ -19,6 +19,9 @@ class Socket{
     
     // 断开游戏
     socket.on('disconnect', this.game.disconnect.bind(this.game, socket))
+
+    // 聊天框
+    socket.on(Constants.MSG_TYPES.ADD_MSG, this.game.addMsg.bind(this.game, socket))
   }
 }
 

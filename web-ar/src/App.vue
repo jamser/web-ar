@@ -2,6 +2,11 @@
   <div style='position: absolute; top: 10px; width:100%; text-align: center; z-index: 1;'>
     <div id="Stats-output" class="stats"></div>
   </div>
+  <div :style="voiceInput" id="voiceInput"></div>
+  <div :style="globalBtn" id="globalBtn"></div>
+  <div v-for="(item, i) in allVoices" :key="i" :style="talkDialog" id="talkDialog">
+    <p style="color: white;">{{item}}</p>
+  </div>
   <div class="joy-con" id="joy-con" :style="joyStyle"></div>
   <div v-if="visible" :style="allHover">
     <span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:white;">{{percent}}</span>
@@ -39,9 +44,10 @@ import useArMakerControls from './js/useArMakerControls.js'
 import useOthersAnimationControl from './js/useOthersAnimationControl.js'
 import useRenderFcts from './js/useRenderFcts.js'
 import useAnimationFrame from './js/useAnimationFrame.js'
+import useInvoiceInput from './js/useInvoiceInput.js'
 
 import { changeAction } from './utils/util.js'
-import { play, emitControl } from './js/networking.js'
+import { play, emitControl, sendMsg } from './js/networking.js'
 import Bus from './js/bus.js'
 import { ASSET_NAMES, ANIMATIONS } from './common/common.js'
 import { defineComponent, onMounted, toRefs, reactive, ref } from 'vue'
@@ -62,23 +68,61 @@ export default defineComponent({
          top: document.documentElement.clientHeight + 'px',
          left: (document.documentElement.clientWidth / 2) + 'px',
          transform: 'translateY(-100px)',
-         'z-index': '9998'
+         visibility: 'hidden',
+         zIndex: 9998
        },
        allHover: {
-         position: 'relative',
+         position: 'absolute',
+         top: 0,
          height: document.documentElement.clientHeight + 'px',
          width: document.documentElement.clientWidth + 'px',
-         "background-color": "rgba(0,0,0,0.5)",
-         "z-index": "9999"
+         backgroundColor: "rgba(0,0,0,0.5)",
+         zIndex: 9999
+       },
+       voiceInput: {
+         position: 'absolute',
+         width: 80 + 'px',
+         height: 80 + 'px',
+         top: document.documentElement.clientHeight + 'px',
+         left:  10 + 'px',
+         visibility: 'hidden',
+         transform: 'translateY(-150px)',
+         background: 'url("./assets/voice.png")',
+         backgroundSize: '100% 100%',
+         zIndex: 9998
+       },
+       globalBtn: {
+         position: 'absolute',
+         width: 80 + 'px',
+         height: 80 + 'px',
+         top: document.documentElement.clientHeight + 'px',
+         right:  10 + 'px',
+         visibility: 'hidden',
+         transform: 'translateY(-150px)',
+         background: 'url("./assets/global.png")',
+         backgroundSize: '100% 100%',
+         zIndex: 9998
+       },
+       talkDialog: {
+         position: 'absolute',
+         top: 0,
+         right: 0,
+         width: document.documentElement.clientHeight / 3 + 'px',
+         height: document.documentElement.clientHeight / 6 + 'px',
+         paddingLeft: '10px',
+         visibility: 'hidden',
+         overflow: 'auto',
+         backgroundColor: "rgba(0,0,0,0.5)",
+         zIndex: 9998
        },
        onRenderFcts: [],
+       allVoices: ['坐标世界导游: 欢迎来到社交元宇宙！'],
        visible: true,
        percent: '0%',
        disabled: true
     })
 
     
-
     Bus.$on('number', (pert)=>{
       state.percent = `资源载入中：${pert}` 
       if(pert === '100%'){
@@ -89,6 +133,26 @@ export default defineComponent({
 
     Bus.$on('hide', () => {
       state.visible = false
+    })
+
+    Bus.$on('say', (msg) => {
+      sendMsg(window.me.username, msg)
+      if(msg.includes('Hello') && msg.includes('跳舞')){
+        window.mylastAnimation = window.me.animation
+        emitControl({animation: 'Flair'})
+        changeAction(window.me, window.mylastAnimation, 'Flair')
+      }else if(msg.includes('Hello') && msg.includes('换个动作')){
+        window.mylastAnimation = window.me.animation
+        let ds = ['Flair','Uprock','HitPop']
+        if(ds.includes(window.me.animation)){
+          ds.splice(ds.findIndex(x => x === window.me.animation), 1)
+        }
+        let f = ds[parseInt(Math.random() * ds.length)]
+        emitControl({animation: f})
+        changeAction(window.me, window.mylastAnimation, f)
+      }else if(msg.includes('Hello') && msg.includes('坐标')){
+        alert(`${me.position.x},${me.position.y},${me.position.z}`)
+      }
     })
     
     const { stats } = useStats() // 监控
@@ -118,6 +182,10 @@ export default defineComponent({
       play(values.userName, objsHub[rnumber])
       show.value = false
       setTimeout(()=>{
+        $('#joy-con').style.visibility = 'visible'
+        $('#voiceInput').style.visibility = 'visible'
+        $('#globalBtn').style.visibility = 'visible'
+        $('#talkDialog').style.visibility = 'visible'
         // 循环渲染数组
         state.onRenderFcts = useRenderFcts(state.onRenderFcts, renderer)
         // 帧率监测
@@ -127,6 +195,8 @@ export default defineComponent({
 
     onMounted(()=>{
       useOthersAnimationControl()  // 动画变化监听
+
+      useInvoiceInput()
 
       const J = new Joystick({
         zone: $('#joy-con')
@@ -165,7 +235,15 @@ export default defineComponent({
               window.myself.rotation.z =  (Math.atan(vector.x / vector.y) + Math.PI / 2)
             }
           }else{
-            window.myself.lookAt(new THREE.Vector3(vx, vy ,vz))
+            if(vector.x > 0 && vector.y > 0){
+              window.myself.rotation.y = Math.PI / 2 - Math.atan(vector.x / vector.y)
+            }else if(vector.x < 0 && vector.y > 0){
+              window.myself.rotation.y = Math.PI / 2 - Math.atan(vector.x / vector.y)
+            }else if(vector.x < 0 && vector.y < 0){
+              window.myself.rotation.y = -Math.atan(vector.x / vector.y) - Math.PI / 2
+            }else if(vector.x > 0 && vector.y < 0){
+              window.myself.rotation.y = -Math.atan(vector.x / vector.y) - Math.PI / 2
+            }
           }
         }
 
@@ -175,7 +253,8 @@ export default defineComponent({
           vz,
           lookAt: {vx, vy, vz},
           rotateX: 2,   // Math.PI / 2,
-          rotationZ: window.myself.rotation.z
+          rotationZ: window.myself.rotation.z,
+          rotationY: window.myself.rotation.y
         })
 
       }
@@ -185,8 +264,7 @@ export default defineComponent({
       ...toRefs(state),
       show,
       userName,
-      onSubmit,
-      dance
+      onSubmit
     }
   }
 })

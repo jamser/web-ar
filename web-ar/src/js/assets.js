@@ -103,7 +103,7 @@ export const getAsset = (id, assetName, username) => {
 		loader.load('fonts/Microsoft_YaHei_Regular.json', function ( font ) {
 			const geometry = new THREE.TextGeometry( username , {
 				font: font,
-				size: 20,
+				size: 10,
 				height: 1,
 				// curveSegments: 12,
 				// bevelEnabled: true,
@@ -118,7 +118,7 @@ export const getAsset = (id, assetName, username) => {
    		    });
 			// const meshMaterial = new THREE.MeshLambertMaterial({color: 0x808080});
 			const fontModel = new THREE.Mesh(geometry, meshMaterial);
-			fontModel.position.set(0, 30, 80);
+			fontModel.position.set(-20, 0, 80);
 			if(assetName === 'knight.glb'){
 				fontModel.rotation.y = Math.PI;
 			}
