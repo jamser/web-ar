@@ -3,7 +3,7 @@
     <div id="Stats-output" class="stats"></div>
   </div>
   <div :style="voiceInput" id="voiceInput"></div>
-  <div :style="globalBtn" id="globalBtn"></div>
+  <div :style="globalBtn" id="globalBtn" @click="jumpLocation"></div>
   <div v-for="(item, i) in allVoices" :key="i" :style="talkDialog" id="talkDialog">
     <p style="color: white;">{{item}}</p>
   </div>
@@ -158,6 +158,10 @@ export default defineComponent({
         alert(`${me.position.x},${me.position.y},${me.position.z}`)
       }
     })
+
+    const jumpLocation = () => {
+      window.location.href = location.origin + '/location/index.html'
+    }
     
     const { stats } = useStats() // 监控
     const { renderer } = useRenderer()  // 渲染器
@@ -268,7 +272,8 @@ export default defineComponent({
       ...toRefs(state),
       show,
       userName,
-      onSubmit
+      onSubmit,
+      jumpLocation
     }
   }
 })
